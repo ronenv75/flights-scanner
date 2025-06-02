@@ -1,9 +1,9 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, request, Response
 import requests
+import json
 from datetime import datetime, timedelta
 
-# טוען משתני סביבה
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
@@ -35,8 +35,7 @@ def get_token():
     }
     response = requests.post(auth_url, data=auth_data)
     try:
-        token = response.json()['access_token']
-        return token
+        return response.json()['access_token']
     except KeyError:
         print("== ERROR getting token ==")
         print("Status Code:", response.status_code)
@@ -61,11 +60,10 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
     resp = requests.get(search_url, headers=headers, params=params)
 
     print("🔍 בקשת טיסה ל:", destination)
-    print(f"🔍 פרטי הבקשה: {params}")
     print(f"📡 קוד תגובה: {resp.status_code}")
     try:
         print("📦 תוכן JSON מה־API:", resp.json())
-    except Exception:
+    except:
         print("❌ שגיאה בפיענוח JSON")
         print(resp.text)
 
@@ -112,7 +110,6 @@ def api_flights():
         if flight:
             results.append(flight)
 
-    # 🟢 שליחה ל־n8n רק אחרי שהסתיימה הלולאה
     if results:
         webhook_url = "https://ronenv.app.n8n.cloud/webhook/7de5db6c-451c-4591-9ad0-c91ce4f9cf5d"
         try:
@@ -121,7 +118,7 @@ def api_flights():
         except Exception as e:
             print("❌ שגיאה בשליחה ל־n8n:", e)
 
-    return jsonify(results)
+    return Response(json.dumps(results, ensure_ascii=False), content_type="application/json")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
