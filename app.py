@@ -47,6 +47,10 @@ def get_token():
 
 def get_cheapest_flight(origin, destination, departure_date, adults=1, max_results=10):
     token = get_token()
+    if not token:
+        print("❌ לא התקבל טוקן")
+        return None
+
     search_url = 'https://test.api.amadeus.com/v2/shopping/flight-offers'
     params = {
         'originLocationCode': origin,
@@ -57,6 +61,14 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
     }
     headers = {'Authorization': f'Bearer {token}'}
     resp = requests.get(search_url, headers=headers, params=params)
+
+    print(f"🔍 בקשה ל־Amadeus עם: {params}")
+    print(f"📡 קוד תגובה: {resp.status_code}")
+    try:
+        print("📦 תוכן JSON מה־API:", resp.json())
+    except:
+        print("❌ שגיאה בפיענוח JSON")
+        print(resp.text)
 
     offers = resp.json().get('data', [])
     best_flight = None
