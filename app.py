@@ -2,8 +2,9 @@ from flask import Flask, jsonify, request
 import requests
 from datetime import datetime, timedelta
 
-CLIENT_ID = 'yyyH2lXd0mYCywkfS9bOPpMONUrZW2N1'
-CLIENT_SECRET = 'Idiy1vXcJjKydmNt'
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
 
 app = Flask(__name__)
 
