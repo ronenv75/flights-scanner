@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 import requests
 from datetime import datetime, timedelta
@@ -5,6 +6,13 @@ from datetime import datetime, timedelta
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
+# בדיקת משתנים מהסביבה
+if not CLIENT_ID or not CLIENT_SECRET:
+    print("❌ שגיאה: CLIENT_ID או CLIENT_SECRET לא הוגדרו!")
+    print("CLIENT_ID:", CLIENT_ID)
+    print("CLIENT_SECRET:", CLIENT_SECRET)
+else:
+    print("✅ משתני הסביבה נטענו בהצלחה.")
 
 app = Flask(__name__)
 
