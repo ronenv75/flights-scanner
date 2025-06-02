@@ -3,10 +3,10 @@ from flask import Flask, jsonify, request
 import requests
 from datetime import datetime, timedelta
 
+# טוען משתני סביבה
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-# בדיקת משתנים מהסביבה
 if not CLIENT_ID or not CLIENT_SECRET:
     print("❌ שגיאה: CLIENT_ID או CLIENT_SECRET לא הוגדרו!")
     print("CLIENT_ID:", CLIENT_ID)
@@ -34,7 +34,6 @@ def get_token():
         'client_secret': CLIENT_SECRET
     }
     response = requests.post(auth_url, data=auth_data)
-
     try:
         token = response.json()['access_token']
         return token
@@ -43,7 +42,6 @@ def get_token():
         print("Status Code:", response.status_code)
         print("Response:", response.text)
         return None
-
 
 def get_cheapest_flight(origin, destination, departure_date, adults=1, max_results=10):
     token = get_token()
@@ -61,13 +59,13 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
     }
     headers = {'Authorization': f'Bearer {token}'}
     resp = requests.get(search_url, headers=headers, params=params)
- print("🔍 בקשת טיסה ל:", destination)
-    print("📦 JSON שהתקבל מה־API:", resp.json())
-    print(f"🔍 בקשה ל־Amadeus עם: {params}")
+
+    print("🔍 בקשת טיסה ל:", destination)
+    print(f"🔍 פרטי הבקשה: {params}")
     print(f"📡 קוד תגובה: {resp.status_code}")
     try:
         print("📦 תוכן JSON מה־API:", resp.json())
-    except:
+    except Exception:
         print("❌ שגיאה בפיענוח JSON")
         print(resp.text)
 
@@ -77,7 +75,7 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
     for offer in offers:
         try:
             seg = offer["itineraries"][0]["segments"][0]
-            flight_number = seg["carrierCode"] + seg["flightNumber"]
+            flight_number = seg["carrierCode"] + seg["number"]
             origin_code = seg["departure"]["iataCode"]
             dest_code = seg["arrival"]["iataCode"]
             price = float(offer["price"]["total"])
@@ -99,7 +97,6 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
         except Exception:
             continue
     return best_flight
-
 
 @app.route('/flights')
 def api_flights():
@@ -125,7 +122,6 @@ def api_flights():
             print("❌ שגיאה בשליחה ל־n8n:", e)
 
     return jsonify(results)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
