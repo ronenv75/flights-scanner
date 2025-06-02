@@ -61,7 +61,8 @@ def get_cheapest_flight(origin, destination, departure_date, adults=1, max_resul
     }
     headers = {'Authorization': f'Bearer {token}'}
     resp = requests.get(search_url, headers=headers, params=params)
-
+ print("🔍 בקשת טיסה ל:", destination)
+    print("📦 JSON שהתקבל מה־API:", resp.json())
     print(f"🔍 בקשה ל־Amadeus עם: {params}")
     print(f"📡 קוד תגובה: {resp.status_code}")
     try:
